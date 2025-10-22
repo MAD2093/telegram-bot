@@ -1,0 +1,47 @@
+services:
+  # Go бот для отправки арбитражных пар
+  go_bot:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    container_name: tg_bot_go
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DATABASE_URL=host=${DB_HOST:-postgres} user=${DB_USER:-postgres} password=${DB_PASSWORD:-password} dbname=${DB_NAME:-tg_bot} port=${DB_PORT:-5432} sslmode=disable TimeZone=UTC
+      - REDIS_ADDR=${REDIS_ADDR:-redis:6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-password}
+    restart: unless-stopped
+    networks:
+      - postgres
+      - redis
+      - monitoring
+
+  # Python бот для настройки фильтров
+  filter_bot:
+    build:
+      context: ./filter_bot
+      dockerfile: Dockerfile
+    container_name: tg_bot_filter
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DB_HOST=${DB_HOST:-postgres}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-tg_bot}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - REDIS_ADDR=${REDIS_ADDR:-redis:6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-password}
+    restart: unless-stopped
+    networks:
+      - postgres
+      - redis
+
+networks:
+  tgbot_spot:
+      external: true
+  redis:
+      external: true
+  postgres:
+    external: true
+  monitoring:
+    external: true

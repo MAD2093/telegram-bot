@@ -1,0 +1,6 @@
+aiogram
+asyncpg
+redis
+sqlalchemy
+grpcio
+grpcio-tools
