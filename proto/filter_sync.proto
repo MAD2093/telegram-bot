@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package filtersync;
+
+option go_package = "./pb";
+
+// сервис синхронизации фильтров
+service FilterSyncService {
+  // Обновляет фильтры для конкретного пользователя
+  rpc UpdateUserFilters(UpdateUserFiltersRequest) returns (UpdateUserFiltersResponse);
+}
+
+// Запрос на обновление фильтров одного пользователя
+message UpdateUserFiltersRequest {
+  int64 tg_id = 1;  // TG ID пользователя
+  string filter = 2;  // Имя фильтра
+  string data = 3;  // JSON с новым фильтрам (сериализованные данные) 
+}
+
+// Ответ на обновление фильтров
+message UpdateUserFiltersResponse {
+  bool success = 1;  // Успешно ли обновление
+  string message = 2;  // Детали (ошибка или подтверждение)
+}
